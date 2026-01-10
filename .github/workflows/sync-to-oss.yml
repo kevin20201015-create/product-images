@@ -9,7 +9,7 @@ on:
       - '**.png'
       - '**.jpeg'
       - '**.webp'
-
+workflow_dispatch:  # 加上这一行，开启手动开关
 jobs:
   build:
     runs-on: ubuntu-latest
