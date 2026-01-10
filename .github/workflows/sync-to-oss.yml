@@ -3,13 +3,14 @@ name: Sync Images to Aliyun OSS
 on:
   push:
     branches:
-      - main  # 监听 main 分支的推送
+      - main
     paths:
       - '**.jpg'
       - '**.png'
       - '**.jpeg'
       - '**.webp'
-workflow_dispatch:  # 加上这一行，开启手动开关
+  workflow_dispatch:  # 必须缩进 2 个空格，与 push 对齐
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +27,6 @@ jobs:
 
       - name: Sync files to OSS
         run: |
-          # 同步图片到阿里云 OSS
           ossutil cp -r . oss://${{ secrets.OSS_BUCKET }}/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp"
 
       - name: Success Message
