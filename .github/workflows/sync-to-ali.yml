@@ -5,10 +5,8 @@ on:
     branches:
       - main
     paths:
-      - '**.jpg'
-      - '**.png'
-      - '**.jpeg'
-      - '**.webp'
+      - 'venus-product/**' # 只有 venus-product 文件夹下的变动才会触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,6 +22,10 @@ jobs:
           access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
 
-      - name: Sync files to OSS
+      - name: Sync Directory Structure to OSS
         run: |
-          ossutil cp -r . oss://${{ secrets.OSS_BUCKET }}/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp"
+          # 关键修改：同步整个目录，-u 表示增量，这样会保持文件夹层级
+          ossutil cp -r venus-product/ oss://${{ secrets.OSS_BUCKET }}/venus-product/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp"
+
+      - name: Success Message
+        run: echo "Sync to Aliyun OSS (venus-product structure) completed!"
