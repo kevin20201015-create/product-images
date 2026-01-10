@@ -9,7 +9,7 @@ on:
       - '**.png'
       - '**.jpeg'
       - '**.webp'
-  workflow_dispatch:  # 必须缩进 2 个空格，与 push 对齐
+  workflow_dispatch:
 
 jobs:
   build:
