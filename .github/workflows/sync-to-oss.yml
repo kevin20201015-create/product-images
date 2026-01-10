@@ -9,7 +9,6 @@ on:
       - '**.png'
       - '**.jpeg'
       - '**.webp'
-  workflow_dispatch:
 
 jobs:
   build:
@@ -28,6 +27,3 @@ jobs:
       - name: Sync files to OSS
         run: |
           ossutil cp -r . oss://${{ secrets.OSS_BUCKET }}/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp"
-
-      - name: Success Message
-        run: echo "Sync to Aliyun OSS completed successfully!"
