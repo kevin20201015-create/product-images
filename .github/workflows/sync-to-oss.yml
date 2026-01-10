@@ -9,6 +9,12 @@ on:
       - '**.png'
       - '**.jpeg'
       - '**.webp'
+  workflow_dispatch:
+    inputs:
+      target_folder:
+        description: 'Manual folder path (e.g. 2026/02), leave empty for auto date'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -24,6 +30,21 @@ jobs:
           access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
           access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
 
+      - name: Calculate Target Folder
+        id: folder
+        run: |
+          # 如果手动触发时输入了文件夹，则使用输入的，否则按当前年月自动生成
+          if [ "${{ github.event.inputs.target_folder }}" != "" ]; then
+            echo "dir=${{ github.event.inputs.target_folder }}" >> $GITHUB_OUTPUT
+          else
+            echo "dir=$(date +'%Y/%m')" >> $GITHUB_OUTPUT
+          fi
+
       - name: Sync files to OSS
         run: |
-          ossutil cp -r . oss://${{ secrets.OSS_BUCKET }}/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp"
+          # 同步到指定的 venus-product 目录下
+          # 变量 ${{ steps.folder.outputs.dir }} 会变成 2026/01 或 2026/02
+          ossutil cp -r . oss://${{ secrets.OSS_BUCKET }}/venus-product/${{ steps.folder.outputs.dir }}/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp" --exclude ".git/*" --exclude ".github/*"
+
+      - name: Success Message
+        run: echo "Sync to Aliyun OSS (/venus-product/${{ steps.folder.outputs.dir }}/) completed!"
