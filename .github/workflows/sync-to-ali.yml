@@ -1,0 +1,29 @@
+name: Sync Images to Aliyun OSS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.jpg'
+      - '**.png'
+      - '**.jpeg'
+      - '**.webp'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup ossutil
+        uses: manyuanrong/setup-ossutil@v2.0
+        with:
+          endpoint: ${{ secrets.OSS_ENDPOINT }}
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+
+      - name: Sync files to OSS
+        run: |
+          ossutil cp -r . oss://${{ secrets.OSS_BUCKET }}/ -u --include "*.jpg" --include "*.png" --include "*.jpeg" --include "*.webp"
